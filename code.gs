@@ -21,7 +21,10 @@ const SHEET_SCHEMAS = {
   'Invigilators': ['assign_id', 'exam_id', 'room_id', 'teacher_id', 'teacher_name', 'teacher_school_id', 'teacher_phone'],
   'Payments': ['payment_id', 'exam_id', 'school_id', 'amount', 'method', 'status', 'payment_date', 'note'],
   'Config': ['key', 'value'],
-  'AuditLog': ['log_id', 'timestamp', 'actor_role', 'actor_name', 'action', 'target_school', 'note']
+  'AuditLog': ['log_id', 'timestamp', 'actor_role', 'actor_name', 'action', 'target_school', 'note'],
+  'AdmitCardPermissions': ['target_type', 'target_id', 'can_view', 'can_generate', 'can_download', 'can_print'],
+  'AdmitCardExamInfo': ['exam_id', 'exam_center', 'exam_time', 'signature_url', 'instructions'],
+  'HallSearchPermissions': ['target_type', 'target_id', 'can_view']
 };
 
 // ===== হেল্পার =====
@@ -58,7 +61,7 @@ function isAdmin(data) { return data.requesterRole === 'admin'; }
 function isAdminOrSuper(data) { return data.requesterRole === 'admin' || data.requesterRole === 'super_admin'; }
 
 function testHash() {
-  Logger.log(hashPassword("admin01"));
+  Logger.log(hashPassword(""));s
 }
 
 // =====================================================================
@@ -96,6 +99,9 @@ function doPost(e) {
       case 'getStudentRegistrationStatus': result = getStudentRegistrationStatus(); break;
       case 'setStudentRegistrationStatus': result = setStudentRegistrationStatus(data); break;
 
+      case 'getNotice': result = getNotice(); break;
+      case 'setNotice': result = setNotice(data); break;
+
       case 'addClass': result = addClass(data); break;
       case 'getClasses': result = getClasses(); break;
 
@@ -126,6 +132,8 @@ function doPost(e) {
 
       case 'generateSeatPlan': result = generateSeatPlan(data); break;
       case 'getSeatPlan': result = getSeatPlan(data); break;
+      case 'getSeatPlanPrintData': result = getSeatPlanPrintData(data); break;
+      case 'getSeatTokenData': result = getSeatTokenData(data); break;
 
       case 'autoAssignInvigilators': result = autoAssignInvigilators(data); break;
       case 'getInvigilators': result = getInvigilators(data); break;
@@ -133,6 +141,21 @@ function doPost(e) {
       case 'getStudentFeeReport': result = getStudentFeeReport(data); break;
       case 'submitPayment': result = submitPayment(data); break;
       case 'updatePaymentStatus': result = updatePaymentStatus(data); break;
+
+      // ---------- Admit Card মডিউল ----------
+      case 'getMyAdmitCardPermission': result = getMyAdmitCardPermissionPublic(data); break;
+      case 'getAllAdmitCardPermissions': result = getAllAdmitCardPermissions(); break;
+      case 'setAdmitCardPermission': result = setAdmitCardPermission(data); break;
+
+      case 'getMyHallSearchPermission': result = getMyHallSearchPermissionPublic(data); break;
+      case 'getAllHallSearchPermissions': result = getAllHallSearchPermissions(); break;
+      case 'setHallSearchPermission': result = setHallSearchPermission(data); break;
+      case 'getHallRoomSearchData': result = getHallRoomSearchData(data); break;
+      case 'setAdmitCardExamInfo': result = setAdmitCardExamInfo(data); break;
+      case 'getAdmitCardExamInfo': result = getAdmitCardExamInfo(data); break;
+      case 'getAdmitCardLogo': result = getAdmitCardLogo(); break;
+      case 'setAdmitCardLogo': result = setAdmitCardLogo(data); break;
+      case 'getAdmitCardData': result = getAdmitCardData(data); break;
 
       default:
         result = { success: false, message: 'অজানা action' };
@@ -179,7 +202,8 @@ function login(data) {
       }
       return {
         success: true, role: userRows[i][4], schoolId: userRows[i][5] || null,
-        schoolName: userRows[i][1] // আসল নাম (Admin/Super Admin/Teacher)
+        schoolName: userRows[i][1], // আসল নাম (Admin/Super Admin/Teacher)
+        userId: userRows[i][0] // Admit Card মডিউলে প্রতি-Admin পারমিশন চেক করতে দরকার
       };
     }
   }
@@ -409,6 +433,9 @@ function getAuditLog(data) {
 function isFalsyValue(value) {
   return value === false || value === 'false' || value === 'FALSE' || value === 'False';
 }
+function isTruthyValue(value) {
+  return value === true || value === 'true' || value === 'TRUE' || value === 'True';
+}
 
 function getStudentRegistrationStatus() {
   const rows = getSheet('Config').getDataRange().getValues();
@@ -430,6 +457,32 @@ function setStudentRegistrationStatus(data) {
     }
   }
   sheet.appendRow(['student_registration_enabled', valueToStore]);
+  return { success: true };
+}
+
+// =====================================================================
+// চলমান নোটিশ (Scrolling Notice) — শুধু Super Admin লিখতে/মুছতে পারবে
+// =====================================================================
+
+function getNotice() {
+  const rows = getSheet('Config').getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === 'site_notice') return { success: true, notice: rows[i][1] || '' };
+  }
+  return { success: true, notice: '' };
+}
+
+function setNotice(data) {
+  if (!isSuperAdmin(data)) return { success: false, message: SUPER_ADMIN_ONLY_MSG };
+  const sheet = getSheet('Config');
+  const rows = sheet.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === 'site_notice') {
+      sheet.getRange(i + 1, 2).setValue(data.notice || '');
+      return { success: true };
+    }
+  }
+  sheet.appendRow(['site_notice', data.notice || '']);
   return { success: true };
 }
 
@@ -487,6 +540,12 @@ function getStudents(data) {
 
 // School Admin (নিজের স্কুলের মধ্যে) বা Super Admin — এডিট করতে পারবে (Delete না)
 function updateStudent(data) {
+  // Registration বন্ধ থাকলে School নিজের ছাত্রের তথ্যও Edit করতে পারবে না (Super Admin প্রভাবিত হবে না)
+  if (data.requesterRole === 'school_admin') {
+    const regStatus = getStudentRegistrationStatus();
+    if (!regStatus.enabled) return { success: false, message: 'শিক্ষার্থী নিবন্ধন বর্তমানে বন্ধ আছে, তাই তথ্য পরিবর্তন করা যাবে না।' };
+  }
+
   const sheet = getSheet('Students');
   const rows = sheet.getDataRange().getValues();
   for (let i = 1; i < rows.length; i++) {
@@ -586,6 +645,10 @@ function getStudentsForRollAssignment() {
 // =====================================================================
 
 function addTeacher(data) {
+  // Registration বন্ধ থাকলে School নতুন শিক্ষকও যোগ করতে পারবে না
+  const regStatus = getStudentRegistrationStatus();
+  if (!regStatus.enabled) return { success: false, message: 'নিবন্ধন বর্তমানে বন্ধ আছে, তাই নতুন শিক্ষক যোগ করা যাবে না।' };
+
   const sheet = getSheet('Teachers');
   const teacherId = generateId('TCH');
   sheet.appendRow([teacherId, data.name, data.subject, data.classId, data.schoolId, data.contact]);
@@ -610,6 +673,12 @@ function getTeachers(data) {
 }
 
 function updateTeacher(data) {
+  // Registration বন্ধ থাকলে School নিজের শিক্ষকের তথ্যও Edit করতে পারবে না (Super Admin প্রভাবিত হবে না)
+  if (data.requesterRole === 'school_admin') {
+    const regStatus = getStudentRegistrationStatus();
+    if (!regStatus.enabled) return { success: false, message: 'নিবন্ধন বর্তমানে বন্ধ আছে, তাই শিক্ষকের তথ্য পরিবর্তন করা যাবে না।' };
+  }
+
   const sheet = getSheet('Teachers');
   const rows = sheet.getDataRange().getValues();
   for (let i = 1; i < rows.length; i++) {
@@ -961,6 +1030,110 @@ function getSeatPlan(data) {
   return { success: true, rooms: roomsOut };
 }
 
+// শুধু Super Admin — Seat Plan Print/PDF এর জন্য হল-ভিত্তিক তথ্য, প্রতিটা স্কুলের ভেতরে ক্লাস অনুযায়ী রোল ভাগ করা
+function getSeatPlanPrintData(data) {
+  if (!isSuperAdmin(data)) return { success: false, message: SUPER_ADMIN_ONLY_MSG };
+
+  const seatRows = getSheet('SeatPlan').getDataRange().getValues();
+  const roomRows = getSheet('Rooms').getDataRange().getValues();
+  const schoolRows = getSheet('Schools').getDataRange().getValues();
+  const studentRows = getSheet('Students').getDataRange().getValues();
+  const classRows = getSheet('Classes').getDataRange().getValues();
+
+  const roomMap = {};
+  for (let i = 1; i < roomRows.length; i++) if (roomRows[i][1] === data.examId) roomMap[roomRows[i][0]] = roomRows[i][2];
+
+  const schoolMap = {}; for (let i = 1; i < schoolRows.length; i++) schoolMap[schoolRows[i][0]] = schoolRows[i][1];
+  const classMap = {}; for (let i = 1; i < classRows.length; i++) classMap[classRows[i][0]] = classRows[i][1];
+
+  // student_id -> classId এবং live roll (রোল যদি সিট প্ল্যান তৈরির পরে বসানো হয়, তাও সঠিক দেখাবে)
+  const studentClassMap = {}, studentRollMap = {};
+  for (let i = 1; i < studentRows.length; i++) {
+    studentClassMap[studentRows[i][0]] = studentRows[i][2];
+    studentRollMap[studentRows[i][0]] = studentRows[i][4];
+  }
+
+  // structure: roomId -> schoolId -> classId -> [rolls]
+  const structure = {};
+  for (let i = 1; i < seatRows.length; i++) {
+    if (seatRows[i][1] !== data.examId) continue;
+    const roomId = seatRows[i][2], studentId = seatRows[i][3], schoolId = seatRows[i][5];
+    const classId = studentClassMap[studentId] || '';
+    const roll = studentRollMap.hasOwnProperty(studentId) ? studentRollMap[studentId] : seatRows[i][6];
+
+    if (!structure[roomId]) structure[roomId] = {};
+    if (!structure[roomId][schoolId]) structure[roomId][schoolId] = {};
+    if (!structure[roomId][schoolId][classId]) structure[roomId][schoolId][classId] = [];
+    structure[roomId][schoolId][classId].push(roll || '—');
+  }
+
+  const orderedClassIds = [];
+  for (let i = 1; i < classRows.length; i++) orderedClassIds.push(classRows[i][0]);
+
+  const halls = Object.keys(structure).map(roomId => {
+    const schoolsObj = structure[roomId];
+    const schools = Object.keys(schoolsObj).map(schoolId => {
+      const classesObj = schoolsObj[schoolId];
+      const knownClassIds = orderedClassIds.filter(cid => classesObj[cid]);
+      const unknownClassIds = Object.keys(classesObj).filter(cid => !orderedClassIds.includes(cid));
+      const classes = [...knownClassIds, ...unknownClassIds].map(cid => {
+        const rolls = classesObj[cid].slice().sort((a, b) => rollSortValue(a) - rollSortValue(b));
+        return { className: classMap[cid] || 'অনির্ধারিত ক্লাস', totalStudents: rolls.length, rolls };
+      });
+      const totalForSchool = classes.reduce((s, c) => s + c.totalStudents, 0);
+      return { schoolName: schoolMap[schoolId] || '—', totalStudents: totalForSchool, classes };
+    });
+    const totalForHall = schools.reduce((s, sc) => s + sc.totalStudents, 0);
+    return { hallName: roomMap[roomId] || roomId, totalStudents: totalForHall, schools };
+  });
+
+  return { success: true, halls };
+}
+
+// শুধু Super Admin — Seat Token/Desk Card এর জন্য হল-ভিত্তিক প্রতিটা শিক্ষার্থীর নাম/রোল/ক্লাস (রোল অনুযায়ী সাজানো)
+function getSeatTokenData(data) {
+  if (!isSuperAdmin(data)) return { success: false, message: SUPER_ADMIN_ONLY_MSG };
+
+  const examId = data.examId;
+  const examRows = getSheet('Exams').getDataRange().getValues();
+  let examName = '';
+  for (let i = 1; i < examRows.length; i++) if (examRows[i][0] === examId) examName = examRows[i][1];
+
+  const seatRows = getSheet('SeatPlan').getDataRange().getValues();
+  const roomRows = getSheet('Rooms').getDataRange().getValues();
+  const studentRows = getSheet('Students').getDataRange().getValues();
+  const classRows = getSheet('Classes').getDataRange().getValues();
+
+  const roomMap = {};
+  for (let i = 1; i < roomRows.length; i++) if (roomRows[i][1] === examId) roomMap[roomRows[i][0]] = roomRows[i][2];
+
+  const classMap = {}; for (let i = 1; i < classRows.length; i++) classMap[classRows[i][0]] = classRows[i][1];
+
+  const studentInfoMap = {};
+  for (let i = 1; i < studentRows.length; i++) {
+    studentInfoMap[studentRows[i][0]] = { classId: studentRows[i][2], roll: studentRows[i][4] };
+  }
+
+  const byHall = {};
+  for (let i = 1; i < seatRows.length; i++) {
+    if (seatRows[i][1] !== examId) continue;
+    const roomId = seatRows[i][2], studentId = seatRows[i][3], studentName = seatRows[i][4];
+    const info = studentInfoMap[studentId] || {};
+    const roll = info.roll || seatRows[i][6];
+    const className = classMap[info.classId] || '—';
+
+    if (!byHall[roomId]) byHall[roomId] = { hallName: roomMap[roomId] || roomId, students: [] };
+    byHall[roomId].students.push({ name: studentName, rollNo: roll || '—', className });
+  }
+
+  const halls = Object.values(byHall).map(h => {
+    h.students.sort((a, b) => rollSortValue(a.rollNo) - rollSortValue(b.rollNo));
+    return h;
+  });
+
+  return { success: true, examName, halls };
+}
+
 // =====================================================================
 // ইনভিজিলেটর — প্রতি রুমে কমপক্ষে ২ জন, ভিন্ন স্কুলের
 // =====================================================================
@@ -1092,4 +1265,303 @@ function updatePaymentStatus(data) {
     }
   }
   return { success: false, message: 'পেমেন্ট রেকর্ড পাওয়া যায়নি' };
+}
+
+// =====================================================================
+// ==================== ADMIT CARD MODULE (নতুন, additive) =============
+// বিদ্যমান কোনো শীট/ফাংশনের স্ট্রাকচার পরিবর্তন করা হয়নি — শুধু নতুন
+// শীট (AdmitCardPermissions, AdmitCardExamInfo) ও নতুন ফাংশন যোগ হয়েছে।
+// AdmitCardPermissions কলাম: target_type(0) target_id(1) can_view(2) can_generate(3) can_download(4) can_print(5)
+// AdmitCardExamInfo কলাম: exam_id(0) exam_center(1) exam_time(2) signature_url(3)
+// =====================================================================
+
+// ডিফল্ট — কোনো পারমিশন সেট না থাকলে সব false (Super Admin ছাড়া কেউ কিছু দেখবে/করবে না)
+function getMyAdmitCardPermission(data) {
+  if (data.requesterRole === 'super_admin') {
+    return { canView: true, canGenerate: true, canDownload: true, canPrint: true };
+  }
+  const targetType = data.requesterRole === 'admin' ? 'admin' : (data.requesterRole === 'school_admin' ? 'school' : null);
+  const targetId = data.requesterRole === 'school_admin' ? data.schoolId : data.requesterId;
+  if (!targetType || !targetId) return { canView: false, canGenerate: false, canDownload: false, canPrint: false };
+
+  const rows = getSheet('AdmitCardPermissions').getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === targetType && rows[i][1] === targetId) {
+      return {
+        canView: isTruthyValue(rows[i][2]), canGenerate: isTruthyValue(rows[i][3]),
+        canDownload: isTruthyValue(rows[i][4]), canPrint: isTruthyValue(rows[i][5])
+      };
+    }
+  }
+  return { canView: false, canGenerate: false, canDownload: false, canPrint: false };
+}
+
+// Frontend থেকে "আমার পারমিশন কী" জিজ্ঞেস করার জন্য পাবলিক wrapper
+function getMyAdmitCardPermissionPublic(data) {
+  return { success: true, permission: getMyAdmitCardPermission(data) };
+}
+
+// শুধু Super Admin — সব স্কুল ও সব Admin এর Admit Card পারমিশন এক জায়গায় দেখা
+function getAllAdmitCardPermissions() {
+  const schoolRows = getSheet('Schools').getDataRange().getValues();
+  const userRows = getSheet('Users').getDataRange().getValues();
+  const permRows = getSheet('AdmitCardPermissions').getDataRange().getValues();
+
+  const permMap = {};
+  for (let i = 1; i < permRows.length; i++) {
+    permMap[permRows[i][0] + '_' + permRows[i][1]] = {
+      canView: isTruthyValue(permRows[i][2]), canGenerate: isTruthyValue(permRows[i][3]),
+      canDownload: isTruthyValue(permRows[i][4]), canPrint: isTruthyValue(permRows[i][5])
+    };
+  }
+  const blank = { canView: false, canGenerate: false, canDownload: false, canPrint: false };
+
+  const list = [];
+  for (let i = 1; i < schoolRows.length; i++) {
+    if (schoolRows[i][5] !== 'approved') continue;
+    const p = permMap['school_' + schoolRows[i][0]] || blank;
+    list.push({ targetType: 'school', targetId: schoolRows[i][0], targetName: schoolRows[i][1], ...p });
+  }
+  for (let i = 1; i < userRows.length; i++) {
+    if (userRows[i][4] !== 'admin') continue;
+    const p = permMap['admin_' + userRows[i][0]] || blank;
+    list.push({ targetType: 'admin', targetId: userRows[i][0], targetName: userRows[i][1], ...p });
+  }
+  return { success: true, permissions: list };
+}
+
+// শুধু Super Admin — একটা নির্দিষ্ট পারমিশন ফিল্ড On/Off করা
+function setAdmitCardPermission(data) {
+  if (!isSuperAdmin(data)) return { success: false, message: SUPER_ADMIN_ONLY_MSG };
+  const fieldColMap = { canView: 3, canGenerate: 4, canDownload: 5, canPrint: 6 }; // 1-indexed sheet column
+  const col = fieldColMap[data.field];
+  if (!col) return { success: false, message: 'অজানা পারমিশন ফিল্ড' };
+
+  const sheet = getSheet('AdmitCardPermissions');
+  const rows = sheet.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === data.targetType && rows[i][1] === data.targetId) {
+      sheet.getRange(i + 1, col).setValue(!!data.value);
+      return { success: true };
+    }
+  }
+  const newRow = [data.targetType, data.targetId, false, false, false, false];
+  const idxMap = { canView: 2, canGenerate: 3, canDownload: 4, canPrint: 5 }; // 0-indexed array position
+  newRow[idxMap[data.field]] = !!data.value;
+  sheet.appendRow(newRow);
+  return { success: true };
+}
+
+// শুধু Super Admin — কোনো পরীক্ষার Center/Time/Signature/Instructions সেট করা
+function setAdmitCardExamInfo(data) {
+  if (!isSuperAdmin(data)) return { success: false, message: SUPER_ADMIN_ONLY_MSG };
+  const sheet = getSheet('AdmitCardExamInfo');
+  const rows = sheet.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === data.examId) {
+      sheet.getRange(i + 1, 2).setValue(data.examCenter || '');
+      sheet.getRange(i + 1, 3).setValue(data.examTime || '');
+      sheet.getRange(i + 1, 4).setValue(data.signatureUrl || '');
+      sheet.getRange(i + 1, 5).setValue(data.instructions || '');
+      return { success: true };
+    }
+  }
+  sheet.appendRow([data.examId, data.examCenter || '', data.examTime || '', data.signatureUrl || '', data.instructions || '']);
+  return { success: true };
+}
+
+const DEFAULT_ADMIT_CARD_INSTRUCTIONS = '<li>পরীক্ষার কেন্দ্রে প্রবেশের সময় এই প্রবেশপত্র সাথে আনতে হবে।</li><li>নির্ধারিত সময়ের কমপক্ষে ৩০ মিনিট আগে কেন্দ্রে উপস্থিত হতে হবে।</li><li>কোনো ইলেকট্রনিক ডিভাইস (মোবাইল/ক্যালকুলেটর) সাথে আনা যাবে না।</li>';
+
+function getAdmitCardExamInfo(data) {
+  const rows = getSheet('AdmitCardExamInfo').getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === data.examId) {
+      return {
+        success: true, examCenter: rows[i][1], examTime: rows[i][2], signatureUrl: rows[i][3],
+        instructions: rows[i][4] || DEFAULT_ADMIT_CARD_INSTRUCTIONS
+      };
+    }
+  }
+  return { success: true, examCenter: '', examTime: '', signatureUrl: '', instructions: DEFAULT_ADMIT_CARD_INSTRUCTIONS };
+}
+
+// প্রতিষ্ঠানের লোগো — সব পরীক্ষায় একই থাকবে বলে গ্লোবাল Config এ রাখা হচ্ছে
+function getAdmitCardLogo() {
+  const rows = getSheet('Config').getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) if (rows[i][0] === 'admit_card_logo_url') return { success: true, logoUrl: rows[i][1] || '' };
+  return { success: true, logoUrl: '' };
+}
+function setAdmitCardLogo(data) {
+  if (!isSuperAdmin(data)) return { success: false, message: SUPER_ADMIN_ONLY_MSG };
+  const sheet = getSheet('Config');
+  const rows = sheet.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === 'admit_card_logo_url') { sheet.getRange(i + 1, 2).setValue(data.logoUrl || ''); return { success: true }; }
+  }
+  sheet.appendRow(['admit_card_logo_url', data.logoUrl || '']);
+  return { success: true };
+}
+
+// মূল ফাংশন — Admit Card তৈরির জন্য সব ডেটা একসাথে ফেরত দেয়
+// স্টুডেন্ট লিস্ট SeatPlan থেকে নেওয়া হয় (যেহেতু এটাই একমাত্র জায়গা যেখানে "কোন স্টুডেন্ট কোন পরীক্ষায় অংশ নিচ্ছে" রেকর্ড আছে)
+function getAdmitCardData(data) {
+  const permission = getMyAdmitCardPermission(data);
+  if (!permission.canView) return { success: false, message: 'Admit Card দেখার অনুমতি নেই। Super Admin-এর সাথে যোগাযোগ করুন।' };
+
+  const targetSchoolId = data.requesterRole === 'school_admin' ? data.schoolId : data.targetSchoolId;
+  if (!targetSchoolId) return { success: false, message: 'স্কুল নির্বাচন করুন' };
+  if (!data.examId) return { success: false, message: 'পরীক্ষা নির্বাচন করুন' };
+
+  const examRows = getSheet('Exams').getDataRange().getValues();
+  let examName = '', examDate = '';
+  for (let i = 1; i < examRows.length; i++) {
+    if (examRows[i][0] === data.examId) { examName = examRows[i][1]; examDate = examRows[i][2]; }
+  }
+  if (!examName) return { success: false, message: 'পরীক্ষা খুঁজে পাওয়া যায়নি' };
+
+  const infoResult = getAdmitCardExamInfo({ examId: data.examId });
+  const logoResult = getAdmitCardLogo();
+
+  const schoolRows = getSheet('Schools').getDataRange().getValues();
+  let schoolName = '';
+  for (let i = 1; i < schoolRows.length; i++) if (schoolRows[i][0] === targetSchoolId) schoolName = schoolRows[i][1];
+
+  const classRows = getSheet('Classes').getDataRange().getValues();
+  const classMap = {}; for (let i = 1; i < classRows.length; i++) classMap[classRows[i][0]] = classRows[i][1];
+
+  const studentRows = getSheet('Students').getDataRange().getValues();
+  const classIdByStudent = {}; for (let i = 1; i < studentRows.length; i++) classIdByStudent[studentRows[i][0]] = studentRows[i][2];
+
+  const seatRows = getSheet('SeatPlan').getDataRange().getValues();
+  const students = [];
+  for (let i = 1; i < seatRows.length; i++) {
+    if (seatRows[i][1] === data.examId && seatRows[i][5] === targetSchoolId) {
+      const studentId = seatRows[i][3];
+      students.push({
+        name: seatRows[i][4],
+        rollNo: seatRows[i][6],
+        className: classMap[classIdByStudent[studentId]] || '—'
+      });
+    }
+  }
+
+  if (students.length === 0) {
+    return { success: false, message: 'এই পরীক্ষার জন্য এই স্কুলের সিট প্ল্যান এখনো তৈরি হয়নি। আগে সিট প্ল্যান তৈরি করুন, তারপর Admit Card Generate করুন।' };
+  }
+  students.sort((a, b) => rollSortValue(a.rollNo) - rollSortValue(b.rollNo));
+
+  return {
+    success: true,
+    examName, examDate,
+    examCenter: infoResult.examCenter, examTime: infoResult.examTime,
+    signatureUrl: infoResult.signatureUrl, logoUrl: logoResult.logoUrl,
+    instructions: infoResult.instructions,
+    schoolName, students,
+    permission // frontend UI বাটন show/hide করার জন্য (generate/download/print)
+  };
+}
+
+// ==================== হল/কক্ষ নম্বর অনুসন্ধান MODULE (নতুন, additive) =============
+// বিদ্যমান কোনো শীট/ফাংশনের স্ট্রাকচার পরিবর্তন করা হয়নি — শুধু নতুন শীট (HallSearchPermissions) ও নতুন ফাংশন যোগ হয়েছে।
+// শুধু দেখার (View-only) ফিচার — কোনো Edit/Delete নেই। Admit Card এর permission-প্যাটার্ন অনুসরণ করা হয়েছে।
+// HallSearchPermissions কলাম: target_type(0) target_id(1) can_view(2)
+// =====================================================================
+
+function getMyHallSearchPermission(data) {
+  if (data.requesterRole === 'super_admin') return { canView: true };
+
+  const targetType = data.requesterRole === 'admin' ? 'admin' : (data.requesterRole === 'school_admin' ? 'school' : null);
+  const targetId = data.requesterRole === 'school_admin' ? data.schoolId : data.requesterId;
+  if (!targetType || !targetId) return { canView: false };
+
+  const rows = getSheet('HallSearchPermissions').getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === targetType && rows[i][1] === targetId) return { canView: isTruthyValue(rows[i][2]) };
+  }
+  return { canView: false };
+}
+
+function getMyHallSearchPermissionPublic(data) {
+  return { success: true, permission: getMyHallSearchPermission(data) };
+}
+
+// শুধু Super Admin — সব স্কুল ও সব Admin এর হল-সার্চ পারমিশন এক জায়গায় দেখা
+function getAllHallSearchPermissions() {
+  const schoolRows = getSheet('Schools').getDataRange().getValues();
+  const userRows = getSheet('Users').getDataRange().getValues();
+  const permRows = getSheet('HallSearchPermissions').getDataRange().getValues();
+
+  const permMap = {};
+  for (let i = 1; i < permRows.length; i++) permMap[permRows[i][0] + '_' + permRows[i][1]] = isTruthyValue(permRows[i][2]);
+
+  const list = [];
+  for (let i = 1; i < schoolRows.length; i++) {
+    if (schoolRows[i][5] !== 'approved') continue;
+    list.push({ targetType: 'school', targetId: schoolRows[i][0], targetName: schoolRows[i][1], canView: permMap['school_' + schoolRows[i][0]] || false });
+  }
+  for (let i = 1; i < userRows.length; i++) {
+    if (userRows[i][4] !== 'admin') continue;
+    list.push({ targetType: 'admin', targetId: userRows[i][0], targetName: userRows[i][1], canView: permMap['admin_' + userRows[i][0]] || false });
+  }
+  return { success: true, permissions: list };
+}
+
+// শুধু Super Admin — কোনো স্কুল/Admin এর জন্য View পারমিশন On/Off করা
+function setHallSearchPermission(data) {
+  if (!isSuperAdmin(data)) return { success: false, message: SUPER_ADMIN_ONLY_MSG };
+  const sheet = getSheet('HallSearchPermissions');
+  const rows = sheet.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === data.targetType && rows[i][1] === data.targetId) {
+      sheet.getRange(i + 1, 3).setValue(!!data.canView);
+      return { success: true };
+    }
+  }
+  sheet.appendRow([data.targetType, data.targetId, !!data.canView]);
+  return { success: true };
+}
+
+// মূল ফাংশন — কোনো শিক্ষার্থী কোন হল/কক্ষে বসবে তা খোঁজা (SeatPlan থেকে স্বয়ংক্রিয়, আলাদা এন্ট্রি লাগে না)
+// data.examId (আবশ্যক), data.schoolId (ঐচ্ছিক — দিলে শুধু ওই স্কুলের ছাত্র, না দিলে অনুমতি অনুযায়ী সব/নিজের স্কুল)
+function getHallRoomSearchData(data) {
+  const permission = getMyHallSearchPermission(data);
+  if (!permission.canView) return { success: false, message: 'এই ফিচার ব্যবহারের অনুমতি নেই। Super Admin-এর সাথে যোগাযোগ করুন।' };
+  if (!data.examId) return { success: false, message: 'পরীক্ষা নির্বাচন করুন' };
+
+  // School User সবসময় নিজের স্কুলেই সীমাবদ্ধ, ফ্রন্টএন্ড থেকে যাই আসুক
+  const filterSchoolId = data.requesterRole === 'school_admin' ? data.requesterSchoolId : (data.schoolId || null);
+
+  const schoolRows = getSheet('Schools').getDataRange().getValues();
+  const schoolMap = {}; for (let i = 1; i < schoolRows.length; i++) schoolMap[schoolRows[i][0]] = schoolRows[i][1];
+
+  const classRows = getSheet('Classes').getDataRange().getValues();
+  const classMap = {}; for (let i = 1; i < classRows.length; i++) classMap[classRows[i][0]] = classRows[i][1];
+
+  const roomRows = getSheet('Rooms').getDataRange().getValues();
+  const roomMap = {};
+  for (let i = 1; i < roomRows.length; i++) if (roomRows[i][1] === data.examId) roomMap[roomRows[i][0]] = roomRows[i][2];
+
+  const studentRows = getSheet('Students').getDataRange().getValues();
+  const classIdByStudent = {};
+  for (let i = 1; i < studentRows.length; i++) classIdByStudent[studentRows[i][0]] = studentRows[i][2];
+
+  const seatRows = getSheet('SeatPlan').getDataRange().getValues();
+  const results = [];
+  for (let i = 1; i < seatRows.length; i++) {
+    if (seatRows[i][1] !== data.examId) continue;
+    const schoolId = seatRows[i][5];
+    if (filterSchoolId && schoolId !== filterSchoolId) continue;
+
+    const studentId = seatRows[i][3];
+    results.push({
+      name: seatRows[i][4],
+      rollNo: seatRows[i][6],
+      className: classMap[classIdByStudent[studentId]] || '—',
+      schoolName: schoolMap[schoolId] || '—',
+      hallName: roomMap[seatRows[i][2]] || '—'
+    });
+  }
+
+  results.sort((a, b) => rollSortValue(a.rollNo) - rollSortValue(b.rollNo));
+  return { success: true, students: results };
 }
