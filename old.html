@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
+  ${escapeHtml(hall.hallName)}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
 <title>গাউছিয়া কমিটি কানকিরহাট</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Tiro+Bangla&display=swap" rel="stylesheet">
 <link rel="icon" href="./img/logo.png">
-<link
-      rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-    />
 <style>
   :root {
     --ink: #1c2340;
@@ -132,17 +134,6 @@
   .empty-note { color:var(--ink-soft); font-size:0.88rem; padding:18px 0; text-align:center; }
   .class-chip { display:inline-block; background:var(--paper); border:1px solid var(--paper-line); padding:6px 14px; border-radius:999px; font-size:0.84rem; margin:0 6px 6px 0; }
 
-  /* ---------- রোল অ্যাসাইনমেন্ট — প্রতিটা ক্লাস আলাদা, স্পষ্টভাবে ভাগ করা সেকশন ---------- */
-  .roll-class-section { border:1.5px solid var(--paper-line); border-radius:10px; margin-bottom:16px; overflow:hidden; background:var(--panel); }
-  .roll-class-header {
-    display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none;
-    background:#fdf6e8; padding:12px 18px; font-family:'Tiro Bangla',serif; font-size:1.05rem; color:var(--accent-deep);
-    border-bottom:1px solid var(--paper-line);
-  }
-  .roll-class-arrow { font-size:0.85rem; color:var(--ink-soft); }
-  .roll-class-count { margin-left:auto; font-family:'Hind Siliguri',sans-serif; font-size:0.82rem; color:var(--ink-soft); font-weight:500; }
-  .roll-class-body { padding:14px 18px; }
-
   .roll-input-row { display:flex; gap:6px; align-items:center; }
   .roll-input-row input { width:70px; padding:6px 8px; font-size:0.85rem; }
 
@@ -205,35 +196,33 @@
 
   footer { text-align:center; color:var(--ink-soft); font-size:0.78rem; margin-top:56px; }
 
-  /* ---------- Admit Card — A4 কে ৪ ভাগে (২ উপরে + ২ নিচে) ---------- */
-  .ac-page {
-    width: 190mm; max-width: 100%; margin: 0 auto 24px; background:#fff;
-    display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:5mm;
-  }
+  /* ---------- Admit Card ---------- */
+  .ac-page { width: 190mm; max-width: 100%; margin: 0 auto 24px; background:#fff; }
   .admit-card {
-    border: 1.5px dashed var(--ink); border-radius: 6px; padding: 10px 14px;
-    height:100%; box-sizing: border-box; display: flex; flex-direction: column;
+    border: 1.5px solid var(--ink); border-radius: 6px; padding: 14px 20px;
+    min-height: 118mm; box-sizing: border-box; display: flex; flex-direction: column;
     background:#fff; font-family:'Hind Siliguri',sans-serif;
   }
-  .ac-header { display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid var(--accent); padding-bottom:5px; margin-bottom:6px; }
-  .ac-title h2 { margin:0; font-family:'Tiro Bangla',serif; font-size:0.86rem; color:var(--ink); }
-  .ac-subtitle { font-size:0.6rem; color:var(--ink-soft); }
-  .ac-logo { height:34px; max-width:80px; width:auto; object-fit:contain; }
-  .ac-body { display:flex; flex-direction:column; gap:6px; flex:1; }
-  .ac-col h4 { font-size:0.68rem; color:var(--accent-deep); margin:0 0 3px; border-bottom:1px dashed var(--paper-line); padding-bottom:2px; }
-  .ac-row { display:flex; justify-content:space-between; font-size:0.72rem; padding:1px 0; gap:8px; }
+  .ac-header { display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--accent); padding-bottom:8px; margin-bottom:10px; }
+  .ac-title h2 { margin:0; font-family:'Tiro Bangla',serif; font-size:1.15rem; color:var(--ink); }
+  .ac-subtitle { font-size:0.78rem; color:var(--ink-soft); }
+  .ac-logo { height:72px; max-width:180px; width:auto; object-fit:contain; }
+  .ac-body { display:flex; gap:24px; flex:1; }
+  .ac-col { flex:1; }
+  .ac-col h4 { font-size:0.82rem; color:var(--accent-deep); margin:0 0 6px; border-bottom:1px dashed var(--paper-line); padding-bottom:4px; }
+  .ac-row { display:flex; justify-content:space-between; font-size:0.84rem; padding:3px 0; gap:10px; }
   .ac-row span { color:var(--ink-soft); white-space:nowrap; }
   .ac-row strong { text-align:left; }
-  .ac-instructions { font-size:0.58rem; color:var(--ink-soft); margin-top:4px; border-top:1px dashed var(--paper-line); padding-top:3px; }
-  .ac-instructions h5 { margin:0 0 2px; font-size:0.6rem; color:var(--ink); }
-  .ac-instructions ul { margin:0; padding-left:14px; }
-  .ac-footer { display:flex; justify-content:flex-end; margin-top:4px; }
+  .ac-instructions { font-size:0.7rem; color:var(--ink-soft); margin-top:8px; border-top:1px dashed var(--paper-line); padding-top:6px; }
+  .ac-instructions h5 { margin:0 0 3px; font-size:0.74rem; color:var(--ink); }
+  .ac-instructions ul { margin:0; padding-left:16px; }
+  .ac-footer { display:flex; justify-content:flex-end; margin-top:10px; }
   .ac-sig-block { display:flex; flex-direction:column; align-items:center; }
-  .ac-signature { height:24px; object-fit:contain; }
-  .ac-sig-label { font-size:0.6rem; border-top:1px solid var(--ink); padding-top:1px; margin-top:1px; min-width:120px; text-align:center; }
+  .ac-signature { height:34px; object-fit:contain; }
+  .ac-sig-label { font-size:0.7rem; border-top:1px solid var(--ink); padding-top:2px; margin-top:2px; min-width:140px; text-align:center; }
 
-  .ac-cut-line { position:relative; text-align:center; margin:5px 0; border-top:1px dashed #999; }
-  .ac-cut-line::after { content:'✂ কেটে নিন'; position:absolute; top:-8px; left:50%; transform:translateX(-50%); background:var(--paper); padding:0 8px; font-size:0.62rem; color:var(--ink-soft); }
+  .ac-cut-line { position:relative; text-align:center; margin:8px 0; border-top:1px dashed #999; }
+  .ac-cut-line::after { content:'✂ কেটে নিন'; position:absolute; top:-9px; left:50%; transform:translateX(-50%); background:var(--paper); padding:0 8px; font-size:0.68rem; color:var(--ink-soft); }
 
   .sp-hall-page { padding:10mm; }
   .sp-hall-page h1 { font-family:'Tiro Bangla',serif; font-size:1.8rem; border-bottom:3px solid var(--ink); padding-bottom:8px; margin:0 0 16px; }
@@ -264,42 +253,22 @@
   .tok-name { font-size:0.82rem; font-weight:600; margin-bottom:2mm; }
   .tok-class { font-size:0.75rem; color:var(--ink-soft); }
 
-  /* ---------- সিট সারাংশ — প্রতি Hall আলাদা পেজে, ১২টা কার্ড (৩x৪), School অনুযায়ী Box/Section ---------- */
-  .ss-hall-page { padding:6mm; }
-  .ss-hall-title { font-family:'Tiro Bangla',serif; font-size:1rem; text-align:center; margin:0 0 5mm; color:var(--ink-soft); }
-  .ss-grid { display:grid; grid-template-columns:repeat(3, 1fr); grid-auto-rows:1fr; gap:4mm; height:270mm; }
-  .ss-school-header {
-    grid-column: 1 / -1; background:#fdf6e8; border:1.5px solid var(--accent); border-radius:6px;
-    padding:2mm 4mm; font-family:'Tiro Bangla',serif; font-size:0.85rem; color:var(--accent-deep);
-    display:flex; justify-content:space-between; align-items:center;
-  }
-  .ss-card {
-    border:1.5px solid var(--ink); border-radius:6px; padding:3mm;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    text-align:center; overflow:hidden; background:#fff;
-  }
-  .ss-roll-label { font-size:0.62rem; color:var(--ink-soft); }
-  .ss-roll { font-size:1.7rem; font-weight:800; font-family:'Tiro Bangla',serif; line-height:1.1; margin:1mm 0 2mm; }
-  .ss-name { font-size:0.72rem; font-weight:600; margin-bottom:1mm; }
-  .ss-class { font-size:0.65rem; color:var(--ink-soft); }
-
   @media print {
     body * { visibility: hidden; }
     #admitCardPrintArea, #admitCardPrintArea *,
     #seatPlanPrintArea, #seatPlanPrintArea *,
     #invigilatorPrintArea, #invigilatorPrintArea *,
-    #tokenCardPrintArea, #tokenCardPrintArea *,
-    #seatSummaryPrintArea, #seatSummaryPrintArea * { visibility: visible; }
-    /* seatPlan/invigilator/tokenCard/seatSummary এর inline display:none (স্ক্রিনে লুকানোর জন্য) প্রিন্টের সময় override করা —
+    #tokenCardPrintArea, #tokenCardPrintArea * { visibility: visible; }
+    /* seatPlan/invigilator/tokenCard এর inline display:none (স্ক্রিনে লুকানোর জন্য) প্রিন্টের সময় override করা —
        display:none থাকলে visibility:visible দিয়েও দেখানো সম্ভব না, তাই এখানে জোর করে block করা হচ্ছে */
-    #admitCardPrintArea, #seatPlanPrintArea, #invigilatorPrintArea, #tokenCardPrintArea, #seatSummaryPrintArea {
+    #admitCardPrintArea, #seatPlanPrintArea, #invigilatorPrintArea, #tokenCardPrintArea {
       display: block !important;
       position: absolute; left: 0; top: 0; width: 100%; margin:0; padding:0;
     }
     .ac-page { page-break-after: always; margin: 0; width: 100%; }
     .ac-page:last-child { page-break-after: auto; }
-    .sp-hall-page, .iv-hall-page, .tok-hall-page, .ss-hall-page { page-break-after: always; width:100%; }
-    .sp-hall-page:last-child, .iv-hall-page:last-child, .tok-hall-page:last-child, .ss-hall-page:last-child { page-break-after: auto; }
+    .sp-hall-page, .iv-hall-page, .tok-hall-page { page-break-after: always; width:100%; }
+    .sp-hall-page:last-child, .iv-hall-page:last-child, .tok-hall-page:last-child { page-break-after: auto; }
     .ac-cut-line::after { display: none; }
     @page { size: A4; margin: 10mm; }
   }
@@ -310,17 +279,17 @@
 <div id="seatPlanPrintArea" style="display:none;"></div>
 <div id="invigilatorPrintArea" style="display:none;"></div>
 <div id="tokenCardPrintArea" style="display:none;"></div>
-<div id="seatSummaryPrintArea" style="display:none;"></div>
 
 <div class="topband"></div>
 <div class="shell">
 
   <header class="brand">
-   <div>
+     <div>
         <h1>গাউছিয়া কমিটি<span> কানকিরহাট</span></h1>
-        <h1 style="font-size: medium;">কেন্দ্রঃ<span> কানকিরহাট উচ্চ বিদ্যালয়</span></h1>
+        <h1 style="font-size: medium;">কেন্দ্রঃ<span> কানকিরহট উচ্চ বিদ্যালয়</span></h1>
     </div>
-    <div style="display: flex; justify-content: space-between; align-items: center;">
+        
+          <div style="display: flex; justify-content: space-between; align-items: center;">
             <div class="tag">শিক্ষা বৃত্তি পরীক্ষা ২০২৬ ইং</div>
         <!-- <a href="./img/logo.png"></a> -->
          <img src="./img/logo_head.png" alt="logo-gck"
@@ -340,8 +309,6 @@
     <div class="switcher">
       <button id="tabLogin" class="active" onclick="switchTab('login')">লগইন</button>
       <button id="tabRegister" onclick="switchTab('register')">স্কুল রেজিস্ট্রেশন</button>
-      <button id="tabHall" onclick="switchTab('hall')" style="display:none;">📍 হল</button>
-      <button id="tabResult" onclick="switchTab('result')" style="display:none;">📊 ফলাফল</button>
     </div>
 
     <div id="loginCard" class="card">
@@ -368,28 +335,6 @@
       <input type="password" id="regPassword" placeholder="••••••••">
       <button class="btn" onclick="handleRegister()" id="registerBtn">রেজিস্ট্রেশন করুন</button>
       <div class="msg" id="registerMsg"></div>
-    </div>
-
-    <div id="hallCard" class="card" style="display:none;">
-      <h2>হল/কক্ষ নম্বর খুঁজুন</h2>
-      <p class="sub">লগইন ছাড়াই — শুধু পরীক্ষা ও রোল নম্বর দিয়ে খুঁজুন</p>
-      <label for="hallPublicExam">পরীক্ষা নির্বাচন করুন</label>
-      <select id="hallPublicExam"><option value="">— নির্বাচন করুন —</option></select>
-      <label for="hallPublicRoll">রোল নম্বর</label>
-      <input type="text" id="hallPublicRoll" placeholder="যেমন: ১০৫">
-      <button class="btn" onclick="handlePublicHallSearch()" id="hallPublicBtn">খুঁজুন</button>
-      <div id="hallPublicResult"></div>
-    </div>
-
-    <div id="resultCard" class="card" style="display:none;">
-      <h2>ফলাফল খুঁজুন</h2>
-      <p class="sub">লগইন ছাড়াই — শুধু পরীক্ষা ও রোল নম্বর দিয়ে খুঁজুন</p>
-      <label for="resultPublicExam">পরীক্ষা নির্বাচন করুন</label>
-      <select id="resultPublicExam"><option value="">— নির্বাচন করুন —</option></select>
-      <label for="resultPublicRoll">রোল নম্বর</label>
-      <input type="text" id="resultPublicRoll" placeholder="যেমন: ১০৫">
-      <button class="btn" onclick="handlePublicResultSearch()" id="resultPublicBtn">খুঁজুন</button>
-      <div id="resultPublicResult"></div>
     </div>
   </div>
 
@@ -518,15 +463,12 @@
 
     <!-- ===================== SUPER ADMIN সেকশন ===================== -->
     <div id="superAdminSections" style="display:none;">
-      <div class="panel" id="regToggleCard" style="padding:18px 22px;">
-        <h3 style="margin-bottom:2px;">শিক্ষার্থী নিবন্ধন — প্রতি স্কুল আলাদাভাবে নিয়ন্ত্রণ</h3>
-        <p class="sub" style="margin:0 0 12px;">বন্ধ করলে সেই নির্দিষ্ট স্কুল নতুন শিক্ষার্থী/শিক্ষক যোগ বা এডিট করতে পারবে না</p>
-        <div class="table-wrap">
-          <table class="data">
-            <thead><tr><th>স্কুলের নাম</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
-            <tbody id="regPermissionsTableBody"><tr><td colspan="3" class="empty-note">লোড হচ্ছে...</td></tr></tbody>
-          </table>
+      <div class="panel" id="regToggleCard" style="padding:18px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div>
+          <h3 style="margin-bottom:2px;">শিক্ষার্থী নিবন্ধন</h3>
+          <p class="sub" style="margin:0;">বন্ধ করলে কোনো স্কুল নতুন শিক্ষার্থী যোগ করতে পারবে না</p>
         </div>
+        <button class="btn" id="regToggleBtn" style="width:auto;margin:0;" onclick="handleToggleRegistration()">লোড হচ্ছে...</button>
       </div>
 
       <div class="panel" style="padding:18px 22px;">
@@ -539,17 +481,6 @@
         </div>
       </div>
 
-      <div class="panel" style="padding:18px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
-        <div>
-          <h3 style="margin-bottom:2px;">লগইন পেজে পাবলিক অনুসন্ধান</h3>
-          <p class="sub" style="margin:0;">চালু করলে যে কেউ লগইন ছাড়াই রোল নম্বর দিয়ে হল/ফলাফল খুঁজতে পারবে</p>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <button class="btn" id="publicHallToggleBtn" style="width:auto;margin:0;" onclick="handleTogglePublicFeature('hall')">লোড হচ্ছে...</button>
-          <button class="btn" id="publicResultToggleBtn" style="width:auto;margin:0;" onclick="handleTogglePublicFeature('result')">লোড হচ্ছে...</button>
-        </div>
-      </div>
-
       <div class="section-tabs">
         <button id="supTabSchools" class="active" onclick="switchSuperSection('schools')">স্কুল</button>
         <button id="supTabClasses" onclick="switchSuperSection('classes')">ক্লাস</button>
@@ -559,21 +490,19 @@
         <button id="supTabFee" onclick="switchSuperSection('fee')">ফি ও পেমেন্ট</button>
         <button id="supTabAdmins" onclick="switchSuperSection('admins')">এডমিন ব্যবস্থাপনা</button>
         <button id="supTabAudit" onclick="switchSuperSection('audit')">অডিট লগ</button>
-        <button id="supTabResults" onclick="switchSuperSection('results')">ফলাফল এন্ট্রি</button>
       </div>
 
       <!-- স্কুল তালিকা + ড্রিলডাউন -->
       <div id="supSecSchools" class="section-view active">
         <div class="panel">
           <h3>সকল স্কুল</h3>
-          <p class="sub">ড্রপডাউন থেকে স্কুল নির্বাচন করুন — অনুমোদন করুন অথবা বিস্তারিত দেখুন ও পরিচালনা করুন</p>
-          <div class="exam-select-row">
-            <div class="field" style="flex:0;">
-              <label>স্কুল নির্বাচন করুন</label>
-              <select id="schoolDropdownSelector" onchange="handleSchoolDropdownChange()"><option value="">— নির্বাচন করুন —</option></select>
-            </div>
+          <p class="sub">নতুন স্কুল অনুমোদন করুন, অথবা যেকোনো স্কুলে ক্লিক করে তার সব ডেটা দেখুন ও পরিচালনা করুন</p>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>স্কুলের নাম</th><th>ইমেইল</th><th>মোবাইল</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+              <tbody id="schoolsTableBody"><tr><td colspan="5" class="empty-note">লোড হচ্ছে...</td></tr></tbody>
+            </table>
           </div>
-          <div id="schoolDropdownSummary"></div>
         </div>
         <div id="schoolDetailPanel"></div>
       </div>
@@ -664,23 +593,10 @@
             <div id="invigilatorListDisplay"><p class="empty-note">এখনো অ্যাসাইন করা হয়নি</p></div>
 
             <h4 style="font-family:'Tiro Bangla',serif;margin:20px 0 10px;">সিট টোকেন/ডেস্ক কার্ড</h4>
-            <p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 10px;">প্রতি A4 পেজে ১২টা কার্ড (৩x৪ গ্রিড)</p>
-            <div class="exam-select-row">
-              <div class="field" style="flex:0;">
-                <label>Hall নির্বাচন করুন</label>
-                <select id="tokenHallFilter"><option value="">সব Hall (একসাথে)</option></select>
-              </div>
-            </div>
+            <p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 10px;">প্রতি A4 পেজে ১২টা কার্ড (৩x৪ গ্রিড), প্রতিটা Hall আলাদা পেজে</p>
             <div class="action-row">
               <button class="btn secondary" onclick="openSeatTokenPrintWindow('print')">🖨️ সিট টোকেন Print</button>
               <button class="btn secondary" onclick="openSeatTokenPrintWindow('download')">⬇️ সিট টোকেন PDF Download</button>
-            </div>
-
-            <h4 style="font-family:'Tiro Bangla',serif;margin:20px 0 10px;">সিট সারাংশ</h4>
-            <p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 10px;">প্রতিটা Hall আলাদা পেজে, প্রতি পেজে ১২টা কার্ড (৩x৪ গ্রিড), প্রতিটা School আলাদা Box/Section এ ভাগ করা</p>
-            <div class="action-row">
-              <button class="btn secondary" onclick="openSeatSummaryPrintWindow('print')">🖨️ সিট সারাংশ Print</button>
-              <button class="btn secondary" onclick="openSeatSummaryPrintWindow('download')">⬇️ সিট সারাংশ PDF Download</button>
             </div>
           </div>
         </div>
@@ -732,21 +648,6 @@
               <tbody id="auditLogTableBody"><tr><td colspan="5" class="empty-note">লোড হচ্ছে...</td></tr></tbody>
             </table>
           </div>
-        </div>
-      </div>
-
-      <!-- ফলাফল এন্ট্রি -->
-      <div id="supSecResults" class="section-view">
-        <div class="panel">
-          <h3>ফলাফল এন্ট্রি</h3>
-          <p class="sub">পরীক্ষা নির্বাচন করুন — সেই পরীক্ষার সিট প্ল্যানে থাকা সব শিক্ষার্থীর জন্য ফলাফল দিন</p>
-          <div class="exam-select-row">
-            <div class="field" style="flex:0;">
-              <label>পরীক্ষা নির্বাচন করুন</label>
-              <select id="resultEntryExamSelector" onchange="loadResultEntryStudents()"><option value="">— নির্বাচন করুন —</option></select>
-            </div>
-          </div>
-          <div id="resultEntryDisplay"></div>
         </div>
       </div>
     </div>
@@ -853,7 +754,6 @@
             <div id="acResultControls" style="display:none;">
               <div class="inline-form">
                 <div class="field"><label>নাম/রোল/শ্রেণি দিয়ে খুঁজুন</label><input type="text" id="acSearchInput" oninput="renderFilteredAdmitCards()" placeholder="খুঁজুন..."></div>
-                <div class="field"><label>হল অনুযায়ী ফিল্টার করুন</label><select id="acHallFilter" onchange="renderFilteredAdmitCards()"><option value="">সব হল</option></select></div>
                 <button class="btn secondary" style="width:auto;" onclick="handleAdmitCardPrint()" id="acPrintBtn">🖨️ প্রিন্ট করুন</button>
                 <button class="btn secondary" style="width:auto;" onclick="handleAdmitCardDownload()" id="acDownloadBtn">⬇️ PDF ডাউনলোড</button>
               </div>
@@ -1030,7 +930,7 @@
 /* =========================================================
    CONFIG
 ========================================================= */
-const API_URL = "https://script.google.com/macros/s/AKfycbxAh1R-aA85BCZMHGNgLbz5Db7i9l5pczzYtlyQ4TlfSX3jJRG5WNxjMqGrusnr80O7/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwNqUikn_borSuqHx36Q73q2ZDgsvj02rJa8fZuO0_49h8tnd--qFi0okvROWuHwv_Q/exec";
 const SUPER_ADMIN_CONTACT = { name: 'Robiul Hosen Sojib', phone: '01617703090' };
 
 let session = null;
@@ -1088,96 +988,10 @@ function showContactModal(message) {
    ট্যাব সুইচ (লগইন/রেজিস্ট্রেশন)
 ========================================================= */
 function switchTab(tab) {
-  ['login', 'register', 'hall', 'result'].forEach(t => {
-    document.getElementById('tab' + capitalize(t)).classList.toggle('active', t === tab);
-    document.getElementById(t + 'Card').style.display = t === tab ? 'block' : 'none';
-  });
-  if (tab === 'hall') loadPublicExamSelector('hallPublicExam');
-  if (tab === 'result') loadPublicExamSelector('resultPublicExam');
-}
-
-// পেজ লোড হওয়ার সাথে সাথে (লগইনের আগেই) চেক করা হয় Public Hall/Result Search চালু আছে কিনা
-async function checkPublicFeatureTabs() {
-  try {
-    const result = await apiCall('getPublicFeatureToggles', {});
-    document.getElementById('tabHall').style.display = result.hallSearchEnabled ? 'inline-block' : 'none';
-    document.getElementById('tabResult').style.display = result.resultSearchEnabled ? 'inline-block' : 'none';
-  } catch (err) { /* silent */ }
-}
-checkPublicFeatureTabs();
-
-async function loadPublicExamSelector(selectorId) {
-  const el = document.getElementById(selectorId);
-  if (el.dataset.loaded === '1') return;
-  try {
-    const result = await apiCall('getExams', {});
-    const exams = result.exams || [];
-    el.innerHTML = '<option value="">— নির্বাচন করুন —</option>' +
-      exams.map(e => `<option value="${e.examId}">${escapeHtml(e.examName)}</option>`).join('');
-    el.dataset.loaded = '1';
-  } catch (err) { /* silent */ }
-}
-
-async function handlePublicHallSearch() {
-  const examId = document.getElementById('hallPublicExam').value;
-  const rollNo = document.getElementById('hallPublicRoll').value.trim();
-  const resultEl = document.getElementById('hallPublicResult');
-  if (!examId || !rollNo) { resultEl.innerHTML = '<div class="msg err">পরীক্ষা ও রোল নম্বর দিন</div>'; return; }
-
-  const btn = document.getElementById('hallPublicBtn');
-  btn.disabled = true; resultEl.innerHTML = '';
-  try {
-    const r = await apiCall('publicHallSearch', { examId, rollNo });
-    if (!r.success) { resultEl.innerHTML = `<div class="msg err">${escapeHtml(r.message)}</div>`; return; }
-    if (!r.found) { resultEl.innerHTML = '<div class="msg err">এই রোল নম্বরে কোনো শিক্ষার্থী পাওয়া যায়নি</div>'; return; }
-    resultEl.innerHTML = `
-      <div class="detail-box" style="margin-top:16px;">
-        <p><strong>${escapeHtml(r.name)}</strong></p>
-        <p>রোল: ${escapeHtml(r.rollNo)}</p>
-        <p>স্কুল: ${escapeHtml(r.schoolName)}</p>
-        <p>হল/কক্ষ: <strong>${escapeHtml(r.hallName)}</strong></p>
-      </div>
-    `;
-  } catch (err) { resultEl.innerHTML = '<div class="msg err">সার্ভারে সংযোগ করা যায়নি</div>'; }
-  finally { btn.disabled = false; }
-}
-
-async function handlePublicResultSearch() {
-  const examId = document.getElementById('resultPublicExam').value;
-  const rollNo = document.getElementById('resultPublicRoll').value.trim();
-  const resultEl = document.getElementById('resultPublicResult');
-  if (!examId || !rollNo) { resultEl.innerHTML = '<div class="msg err">পরীক্ষা ও রোল নম্বর দিন</div>'; return; }
-
-  const btn = document.getElementById('resultPublicBtn');
-  btn.disabled = true; resultEl.innerHTML = '';
-  try {
-    const r = await apiCall('publicResultSearch', { examId, rollNo });
-    if (!r.success) { resultEl.innerHTML = `<div class="msg err">${escapeHtml(r.message)}</div>`; return; }
-    if (!r.found) { resultEl.innerHTML = '<div class="msg err">এই রোল নম্বরের ফলাফল এখনো প্রকাশিত হয়নি</div>'; return; }
-
-    if (r.status === 'pass') {
-      resultEl.innerHTML = `
-        <div class="detail-box" style="margin-top:16px;">
-          <p><strong>${escapeHtml(r.name)}</strong> — অভিনন্দন, আপনি উত্তীর্ণ হয়েছেন! 🎉</p>
-          <p>রোল: ${escapeHtml(r.rollNo)}</p>
-          <p>স্কুল: ${escapeHtml(r.schoolName)}</p>
-          <p>পরীক্ষা: ${escapeHtml(r.examName)}</p>
-          ${r.subjectMarks ? `<p>বিষয়ভিত্তিক নম্বর: ${escapeHtml(r.subjectMarks)}</p>` : ''}
-          <p>মোট নম্বর: ${escapeHtml(String(r.totalMarks || '—'))}</p>
-          <p>GPA/Result: ${escapeHtml(String(r.gpa || '—'))}</p>
-        </div>
-      `;
-    } else {
-      resultEl.innerHTML = `
-        <div class="detail-box" style="margin-top:16px;">
-          <p><strong>${escapeHtml(r.name)}</strong></p>
-          <p>রোল: ${escapeHtml(r.rollNo)}</p>
-          <p style="color:var(--danger);font-weight:600;">দুঃখিত, আপনি উত্তীর্ণ হননি।</p>
-        </div>
-      `;
-    }
-  } catch (err) { resultEl.innerHTML = '<div class="msg err">সার্ভারে সংযোগ করা যায়নি</div>'; }
-  finally { btn.disabled = false; }
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  document.getElementById('loginCard').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('registerCard').style.display = tab === 'register' ? 'block' : 'none';
 }
 function showMsg(elId, text, type) {
   const el = document.getElementById(elId);
@@ -1269,7 +1083,6 @@ function renderDashboard() {
     loadExams();
     loadRegistrationToggle();
     loadNoticeForSuperAdmin();
-    loadPublicFeatureTogglesForSuperAdmin();
   } else if (session.role === 'admin') {
     document.getElementById('adminSections').style.display = 'block';
     loadAdminPendingSchools();
@@ -1291,7 +1104,7 @@ function switchSection(section) {
   });
 }
 function switchSuperSection(section) {
-  ['schools', 'classes', 'allstudents', 'allteachers', 'exam', 'fee', 'admins', 'audit', 'results'].forEach(s => {
+  ['schools', 'classes', 'allstudents', 'allteachers', 'exam', 'fee', 'admins', 'audit'].forEach(s => {
     document.getElementById('supTab' + capitalize(s)).classList.toggle('active', s === section);
     document.getElementById('supSec' + capitalize(s)).classList.toggle('active', s === section);
   });
@@ -1299,7 +1112,6 @@ function switchSuperSection(section) {
   if (section === 'allteachers') loadAllTeachersFlat();
   if (section === 'admins') loadAdminsList();
   if (section === 'audit') loadAuditLog();
-  if (section === 'results') loadResultEntryExamSelector();
 }
 function switchAdminSection(section) {
   ['pending', 'allschools', 'report'].forEach(s => {
@@ -1329,61 +1141,33 @@ async function loadSuperAdminStats() {
 /* =========================================================
    সুপার অ্যাডমিন — স্কুল লিস্ট + ড্রিলডাউন
 ========================================================= */
-let cachedSchoolsList = [];
-
 async function loadSchoolsList() {
-  const selector = document.getElementById('schoolDropdownSelector');
-  const previouslySelected = selector.value;
+  const tbody = document.getElementById('schoolsTableBody');
+  tbody.innerHTML = '<tr><td colspan="5" class="empty-note">লোড হচ্ছে...</td></tr>';
   try {
     const result = await apiCall('getAllSchools', {});
-    cachedSchoolsList = result.schools || [];
+    const schools = result.schools || [];
+    if (schools.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="empty-note">কোনো স্কুল রেজিস্টার করেনি</td></tr>'; return; }
 
     const statusLabel = { pending: 'পেন্ডিং', approved: 'অনুমোদিত', rejected: 'বাতিল', returned: 'ফেরত পাঠানো হয়েছে' };
-    selector.innerHTML = '<option value="">— নির্বাচন করুন —</option>' +
-      cachedSchoolsList.map(s => `<option value="${s.schoolId}">${escapeHtml(s.schoolName)} (${statusLabel[s.status] || s.status})</option>`).join('');
-
-    if (previouslySelected && cachedSchoolsList.some(s => s.schoolId === previouslySelected)) {
-      selector.value = previouslySelected;
-    }
-    handleSchoolDropdownChange();
-  } catch (err) {
-    selector.innerHTML = '<option value="">লোড করতে সমস্যা হয়েছে। API URL চেক করুন।</option>';
-  }
-}
-
-function handleSchoolDropdownChange() {
-  const schoolId = document.getElementById('schoolDropdownSelector').value;
-  const summaryEl = document.getElementById('schoolDropdownSummary');
-
-  if (!schoolId) {
-    summaryEl.innerHTML = cachedSchoolsList.length === 0 ? '<p class="empty-note">কোনো স্কুল রেজিস্টার করেনি</p>' : '';
-    document.getElementById('schoolDetailPanel').innerHTML = '';
-    return;
-  }
-
-  const school = cachedSchoolsList.find(s => s.schoolId === schoolId);
-  if (!school) { summaryEl.innerHTML = ''; return; }
-
-  const statusLabel = { pending: 'পেন্ডিং', approved: 'অনুমোদিত', rejected: 'বাতিল', returned: 'ফেরত পাঠানো হয়েছে' };
-  summaryEl.innerHTML = `
-    <div class="detail-box">
-      <div class="school-info-row">
-        <div class="meta">
-          <p><strong>${escapeHtml(school.schoolName)}</strong> <span class="badge ${school.status}">${statusLabel[school.status] || school.status}</span></p>
-          <p>ইমেইল: ${escapeHtml(school.email)}</p>
-          <p>মোবাইল: ${escapeHtml(school.phone || '—')}</p>
-        </div>
-        <div class="row-actions">
+    tbody.innerHTML = schools.map(school => `
+      <tr class="clickable" onclick="openSchoolDetail('${school.schoolId}')">
+        <td>${escapeHtml(school.schoolName)}</td>
+        <td>${escapeHtml(school.email)}</td>
+        <td>${escapeHtml(school.phone || '—')}</td>
+        <td><span class="badge ${school.status}">${statusLabel[school.status] || school.status}</span></td>
+        <td class="row-actions" onclick="event.stopPropagation()">
           ${school.status === 'pending' ? `
             <button class="mini-btn approve" onclick="handleSuperApprove('${school.schoolId}')">অনুমোদন</button>
             <button class="mini-btn reject" onclick="handleSuperReject('${school.schoolId}')">বাতিল</button>
             <button class="mini-btn edit" onclick="handleSuperReturn('${school.schoolId}')">ফেরত</button>
           ` : ''}
-          <button class="mini-btn edit" onclick="openSchoolDetail('${school.schoolId}')">বিস্তারিত দেখুন</button>
-        </div>
-      </div>
-    </div>
-  `;
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-note">লোড করতে সমস্যা হয়েছে। API URL চেক করুন।</td></tr>';
+  }
 }
 
 /* =========================================================
@@ -1418,34 +1202,29 @@ function handleSuperReject(schoolId) { performReject(schoolId, () => { loadSchoo
 function handleSuperReturn(schoolId) { performReturn(schoolId, () => { loadSchoolsList(); loadSuperAdminStats(); }); }
 
 /* =========================================================
-   সুপার অ্যাডমিন — প্রতি স্কুল আলাদা শিক্ষার্থী নিবন্ধন ON/OFF
+   সুপার অ্যাডমিন — শিক্ষার্থী নিবন্ধন ON/OFF টগল
 ========================================================= */
 async function loadRegistrationToggle() {
-  const tbody = document.getElementById('regPermissionsTableBody');
-  tbody.innerHTML = '<tr><td colspan="3" class="empty-note">লোড হচ্ছে...</td></tr>';
+  const btn = document.getElementById('regToggleBtn');
   try {
-    const result = await apiCall('getAllStudentRegPermissions', {});
-    const schools = result.schools || [];
-    tbody.innerHTML = schools.length === 0
-      ? '<tr><td colspan="3" class="empty-note">কোনো অনুমোদিত স্কুল নেই</td></tr>'
-      : schools.map(s => `
-        <tr>
-          <td>${escapeHtml(s.schoolName)}</td>
-          <td><span class="badge ${s.enabled ? 'approved' : 'rejected'}">${s.enabled ? 'চালু আছে' : 'বন্ধ আছে'}</span></td>
-          <td>
-            <button class="mini-btn ${s.enabled ? 'reject' : 'approve'}" onclick="handleToggleSchoolRegistration('${s.schoolId}', ${!s.enabled})">
-              ${s.enabled ? 'বন্ধ করুন' : 'চালু করুন'}
-            </button>
-          </td>
-        </tr>
-      `).join('');
-  } catch (err) { tbody.innerHTML = '<tr><td colspan="3" class="empty-note">লোড করতে সমস্যা হয়েছে</td></tr>'; }
+    const result = await apiCall('getStudentRegistrationStatus', {});
+    renderRegToggleBtn(result.enabled);
+  } catch (err) { btn.textContent = 'লোড করতে সমস্যা হয়েছে'; }
 }
-async function handleToggleSchoolRegistration(schoolId, newEnabled) {
+function renderRegToggleBtn(enabled) {
+  const btn = document.getElementById('regToggleBtn');
+  btn.textContent = enabled ? '🟢 চালু আছে — বন্ধ করুন' : '🔴 বন্ধ আছে — চালু করুন';
+  btn.dataset.enabled = enabled ? '1' : '0';
+}
+async function handleToggleRegistration() {
+  const btn = document.getElementById('regToggleBtn');
+  const currentlyEnabled = btn.dataset.enabled === '1';
+  btn.disabled = true;
   try {
-    const r = await apiCall('setStudentRegistrationStatus', { schoolId, enabled: newEnabled, requesterRole: session.role });
-    if (r.success) loadRegistrationToggle(); else alert(r.message);
+    const r = await apiCall('setStudentRegistrationStatus', { enabled: !currentlyEnabled, requesterRole: session.role });
+    if (r.success) renderRegToggleBtn(!currentlyEnabled); else alert(r.message);
   } catch (err) { alert('সার্ভারে সংযোগ করা যায়নি'); }
+  finally { btn.disabled = false; }
 }
 
 /* =========================================================
@@ -1474,113 +1253,8 @@ async function handleClearNotice() {
 }
 
 /* =========================================================
-   সুপার অ্যাডমিন — লগইন পেজে পাবলিক হল/ফলাফল অনুসন্ধান টগল
+   সুপার অ্যাডমিন — Admin ব্যবস্থাপনা
 ========================================================= */
-async function loadPublicFeatureTogglesForSuperAdmin() {
-  try {
-    const result = await apiCall('getPublicFeatureToggles', {});
-    renderPublicToggleBtn('publicHallToggleBtn', 'হল অনুসন্ধান', result.hallSearchEnabled);
-    renderPublicToggleBtn('publicResultToggleBtn', 'ফলাফল অনুসন্ধান', result.resultSearchEnabled);
-  } catch (err) { /* silent */ }
-}
-function renderPublicToggleBtn(btnId, label, enabled) {
-  const btn = document.getElementById(btnId);
-  btn.textContent = (enabled ? '🟢 ' : '🔴 ') + label + (enabled ? ' — বন্ধ করুন' : ' — চালু করুন');
-  btn.dataset.enabled = enabled ? '1' : '0';
-}
-async function handleTogglePublicFeature(key) {
-  const btnId = key === 'hall' ? 'publicHallToggleBtn' : 'publicResultToggleBtn';
-  const label = key === 'hall' ? 'হল অনুসন্ধান' : 'ফলাফল অনুসন্ধান';
-  const btn = document.getElementById(btnId);
-  const currentlyEnabled = btn.dataset.enabled === '1';
-  btn.disabled = true;
-  try {
-    const r = await apiCall('setPublicFeatureToggle', { key, enabled: !currentlyEnabled, requesterRole: session.role });
-    if (r.success) renderPublicToggleBtn(btnId, label, !currentlyEnabled); else alert(r.message);
-  } catch (err) { alert('সার্ভারে সংযোগ করা যায়নি'); }
-  finally { btn.disabled = false; }
-}
-
-/* =========================================================
-   সুপার অ্যাডমিন — ফলাফল এন্ট্রি
-========================================================= */
-async function loadResultEntryExamSelector() {
-  try {
-    const result = await apiCall('getExams', {});
-    const exams = result.exams || [];
-    document.getElementById('resultEntryExamSelector').innerHTML = '<option value="">— নির্বাচন করুন —</option>' +
-      exams.map(e => `<option value="${e.examId}">${escapeHtml(e.examName)}</option>`).join('');
-  } catch (err) { /* silent */ }
-}
-
-async function loadResultEntryStudents() {
-  const examId = document.getElementById('resultEntryExamSelector').value;
-  const el = document.getElementById('resultEntryDisplay');
-  if (!examId) { el.innerHTML = ''; return; }
-
-  el.innerHTML = '<p class="empty-note">লোড হচ্ছে...</p>';
-  try {
-    const seatResult = await apiCall('getSeatPlan', { examId });
-    // getSeatPlan রুম-ভিত্তিক গ্রুপ করা রাখে, এখানে ফ্ল্যাট স্টুডেন্ট লিস্ট দরকার — তাই আলাদা করে সিট প্ল্যান প্রিন্ট ডেটা থেকে না নিয়ে সরাসরি ছাত্র তালিকা টানা হচ্ছে
-    const flatResult = await apiCall('getSeatTokenData', { examId, requesterRole: session.role });
-    if (!flatResult.success) { el.innerHTML = `<p class="empty-note">${escapeHtml(flatResult.message)}</p>`; return; }
-
-    const allStudents = [];
-    (flatResult.halls || []).forEach(h => h.students.forEach(s => allStudents.push(s)));
-
-    if (allStudents.length === 0) { el.innerHTML = '<p class="empty-note">এই পরীক্ষার সিট প্ল্যান এখনো তৈরি হয়নি</p>'; return; }
-
-    // প্রতিটা ছাত্রের বিদ্যমান ফলাফল (থাকলে) লোড করার জন্য স্টুডেন্ট আইডি দরকার — SeatPlan থেকে সরাসরি টানা হচ্ছে
-    const seatPlanRaw = await apiCall('getSeatTokenData', { examId, requesterRole: session.role });
-
-    el.innerHTML = `
-      <div class="table-wrap">
-        <table class="data">
-          <thead><tr><th>নাম</th><th>রোল</th><th>ক্লাস</th><th>বিষয়ভিত্তিক নম্বর</th><th>মোট নম্বর</th><th>GPA</th><th>স্ট্যাটাস</th><th></th></tr></thead>
-          <tbody>
-            ${allStudents.map((st, idx) => `
-              <tr>
-                <td>${escapeHtml(st.name)}</td>
-                <td>${escapeHtml(String(st.rollNo))}</td>
-                <td>${escapeHtml(st.className)}</td>
-                <td><input type="text" id="resSubj_${idx}" placeholder="বাংলা:৮৫, ইংরেজি:৯০" style="width:180px;"></td>
-                <td><input type="text" id="resTotal_${idx}" placeholder="মোট" style="width:70px;"></td>
-                <td><input type="text" id="resGpa_${idx}" placeholder="GPA" style="width:60px;"></td>
-                <td>
-                  <select id="resStatus_${idx}">
-                    <option value="pass">পাস</option>
-                    <option value="fail">ফেল</option>
-                  </select>
-                </td>
-                <td><button class="mini-btn edit" onclick="handleSaveResult('${examId}','${escapeHtml(st.rollNo)}',${idx})">সেভ</button></td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
-  } catch (err) { el.innerHTML = '<p class="empty-note">লোড করতে সমস্যা হয়েছে</p>'; }
-}
-
-async function handleSaveResult(examId, rollNo, idx) {
-  const subjectMarks = document.getElementById('resSubj_' + idx).value.trim();
-  const totalMarks = document.getElementById('resTotal_' + idx).value.trim();
-  const gpa = document.getElementById('resGpa_' + idx).value.trim();
-  const status = document.getElementById('resStatus_' + idx).value;
-
-  try {
-    // রোল দিয়ে স্টুডেন্ট আইডি ও স্কুল আইডি খুঁজে বের করার জন্য হল সার্চ ব্যবহার করা হচ্ছে (একই ডেটা উৎস)
-    const hallInfo = await apiCall('publicHallSearch', { examId, rollNo });
-    if (!hallInfo.found) { alert('শিক্ষার্থী খুঁজে পাওয়া যায়নি'); return; }
-
-    const r = await apiCall('setStudentResult', {
-      examId, rollNo, subjectMarks, totalMarks, gpa, status,
-      studentId: hallInfo.studentId, schoolId: hallInfo.schoolId,
-      requesterRole: session.role
-    });
-    if (r.success) alert('ফলাফল সংরক্ষণ করা হয়েছে'); else alert(r.message);
-  } catch (err) { alert('সার্ভারে সংযোগ করা যায়নি'); }
-}
 async function loadAdminsList() {
   const tbody = document.getElementById('adminsTableBody');
   tbody.innerHTML = '<tr><td colspan="4" class="empty-note">লোড হচ্ছে...</td></tr>';
@@ -2014,51 +1688,35 @@ async function loadAllStudentsRollView() {
 
     if (classes.length === 0) { el.innerHTML = '<p class="empty-note">এখনো কোনো শিক্ষার্থী নেই</p>'; return; }
 
-    el.innerHTML = classes.map((cls, idx) => `
-      <div class="roll-class-section">
-        <div class="roll-class-header" onclick="toggleRollClassSection(${idx})">
-          <span class="roll-class-arrow" id="rollArrow_${idx}">▾</span>
-          <span>${escapeHtml(cls.className)}</span>
-          <span class="roll-class-count">${cls.students.length} জন</span>
-        </div>
-        <div class="roll-class-body" id="rollBody_${idx}">
-          <div class="table-wrap">
-            <table class="data">
-              <thead><tr><th>নাম</th><th>স্কুল</th><th>রোল (বাংলা)</th><th>অ্যাকশন</th></tr></thead>
-              <tbody>
-                ${cls.students.map(st => `
-                  <tr>
-                    <td>${escapeHtml(st.name)}</td>
-                    <td>${escapeHtml(st.schoolName)}</td>
-                    <td>
-                      <div class="roll-input-row">
-                        <input type="text" id="roll_${st.studentId}" value="${escapeHtml(st.rollNo || '')}" placeholder="রোল">
-                        <button class="mini-btn edit" onclick="handleSaveRoll('${st.studentId}')">সেভ</button>
-                      </div>
-                    </td>
-                    <td class="row-actions">
-                      <button class="mini-btn edit" onclick='openEditStudentFromFlat("${st.studentId}")'>এডিট</button>
-                      <button class="mini-btn delete" onclick="handleDeleteStudentSuper('${st.studentId}')">ডিলিট</button>
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
+    el.innerHTML = classes.map(cls => `
+      <h4>${escapeHtml(cls.className)} (${cls.students.length} জন)</h4>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>নাম</th><th>স্কুল</th><th>রোল (বাংলা)</th><th>অ্যাকশন</th></tr></thead>
+          <tbody>
+            ${cls.students.map(st => `
+              <tr>
+                <td>${escapeHtml(st.name)}</td>
+                <td>${escapeHtml(st.schoolName)}</td>
+                <td>
+                  <div class="roll-input-row">
+                    <input type="text" id="roll_${st.studentId}" value="${escapeHtml(st.rollNo || '')}" placeholder="রোল">
+                    <button class="mini-btn edit" onclick="handleSaveRoll('${st.studentId}')">সেভ</button>
+                  </div>
+                </td>
+                <td class="row-actions">
+                  <button class="mini-btn edit" onclick='openEditStudentFromFlat("${st.studentId}")'>এডিট</button>
+                  <button class="mini-btn delete" onclick="handleDeleteStudentSuper('${st.studentId}')">ডিলিট</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
       </div>
     `).join('');
   } catch (err) {
     el.innerHTML = '<p class="empty-note">লোড করতে সমস্যা হয়েছে</p>';
   }
-}
-
-function toggleRollClassSection(idx) {
-  const body = document.getElementById('rollBody_' + idx);
-  const arrow = document.getElementById('rollArrow_' + idx);
-  const isOpen = body.style.display !== 'none';
-  body.style.display = isOpen ? 'none' : 'block';
-  arrow.textContent = isOpen ? '▸' : '▾';
 }
 
 // রোল-ভিউ থেকে এডিট করতে গেলে পূর্ণ স্টুডেন্ট অবজেক্ট দরকার (father/mother/contact/classId সহ) — তাই আলাদা করে খুঁজে আনা হচ্ছে
@@ -2110,7 +1768,7 @@ async function checkRegistrationBanner() {
   const banner = document.getElementById('regClosedBanner');
   const btn = document.getElementById('addStudentBtn');
   try {
-    const result = await apiCall('getStudentRegistrationStatus', { schoolId: session.schoolId });
+    const result = await apiCall('getStudentRegistrationStatus', {});
     if (!result.enabled) {
       banner.innerHTML = '<div class="warn-box">শিক্ষার্থী নিবন্ধন বর্তমানে Super Admin কর্তৃক বন্ধ রাখা হয়েছে। নতুন শিক্ষার্থী যোগ করা যাবে না।</div>';
       if (btn) btn.disabled = true;
@@ -2335,18 +1993,6 @@ function handleExamSelect() {
   document.getElementById('seatPlanWarning').innerHTML = '';
   document.getElementById('invigilatorListDisplay').innerHTML = '<p class="empty-note">এখনো অ্যাসাইন করা হয়নি</p>';
   loadRoomsList();
-  loadTokenHallFilterOptions();
-}
-
-async function loadTokenHallFilterOptions() {
-  const selector = document.getElementById('tokenHallFilter');
-  if (!currentExamId) { selector.innerHTML = '<option value="">সব Hall (একসাথে)</option>'; return; }
-  try {
-    const result = await apiCall('getRooms', { examId: currentExamId });
-    const rooms = result.rooms || [];
-    selector.innerHTML = '<option value="">সব Hall (একসাথে)</option>' +
-      rooms.map(r => `<option value="${r.roomId}">${escapeHtml(r.roomName)}</option>`).join('');
-  } catch (err) { /* silent */ }
 }
 
 /* =========================================================
@@ -3069,11 +2715,6 @@ async function handleGenerateAdmitCards() {
     document.getElementById('acSearchInput').value = '';
     document.getElementById('acPrintBtn').style.display = result.permission.canPrint ? 'inline-block' : 'none';
     document.getElementById('acDownloadBtn').style.display = result.permission.canDownload ? 'inline-block' : 'none';
-
-    const hallNames = [...new Set((result.students || []).map(st => st.hallName).filter(Boolean))];
-    document.getElementById('acHallFilter').innerHTML = '<option value="">সব হল</option>' +
-      hallNames.map(h => `<option value="${escapeHtml(h)}">${escapeHtml(h)}</option>`).join('');
-
     renderFilteredAdmitCards();
   } catch (err) {
     msgEl.innerHTML = '<div class="warn-box">সার্ভারে সংযোগ করা যায়নি</div>';
@@ -3085,27 +2726,24 @@ async function handleGenerateAdmitCards() {
 function renderFilteredAdmitCards() {
   if (!acFetchedData) return;
   const query = document.getElementById('acSearchInput').value.trim().toLowerCase();
-  const hallQuery = document.getElementById('acHallFilter').value;
 
-  const filtered = acFetchedData.students.filter(st =>
-    (!query || (st.name || '').toLowerCase().includes(query) ||
-      String(st.rollNo || '').toLowerCase().includes(query) ||
-      (st.className || '').toLowerCase().includes(query)) &&
-    (!hallQuery || st.hallName === hallQuery)
+  const filtered = !query ? acFetchedData.students : acFetchedData.students.filter(st =>
+    (st.name || '').toLowerCase().includes(query) ||
+    String(st.rollNo || '').toLowerCase().includes(query) ||
+    (st.className || '').toLowerCase().includes(query)
   );
 
   const pages = [];
-  for (let i = 0; i < filtered.length; i += 4) pages.push(filtered.slice(i, i + 4));
+  for (let i = 0; i < filtered.length; i += 2) pages.push(filtered.slice(i, i + 2));
 
   document.getElementById('seatPlanPrintArea').innerHTML = '';
   document.getElementById('invigilatorPrintArea').innerHTML = '';
   document.getElementById('tokenCardPrintArea').innerHTML = '';
-  document.getElementById('seatSummaryPrintArea').innerHTML = '';
   document.getElementById('admitCardPrintArea').innerHTML = pages.length === 0
     ? '<p class="empty-note">কোনো শিক্ষার্থী পাওয়া যায়নি</p>'
-    : pages.map(group => `
+    : pages.map(pair => `
       <div class="ac-page">
-        ${group.map(st => renderSingleAdmitCard(acFetchedData, st)).join('')}
+        ${pair.map((st, idx) => (idx === 1 ? '<div class="ac-cut-line"></div>' : '') + renderSingleAdmitCard(acFetchedData, st)).join('')}
       </div>
     `).join('');
 }
@@ -3185,7 +2823,6 @@ async function openSeatPlanPrintWindow(mode) {
     document.getElementById('admitCardPrintArea').innerHTML = '';
     document.getElementById('invigilatorPrintArea').innerHTML = '';
     document.getElementById('tokenCardPrintArea').innerHTML = '';
-    document.getElementById('seatSummaryPrintArea').innerHTML = '';
     document.getElementById('seatPlanPrintArea').innerHTML = html;
 
     setTimeout(() => window.print(), 100);
@@ -3219,7 +2856,6 @@ async function openInvigilatorSheetPrintWindow(mode) {
     document.getElementById('admitCardPrintArea').innerHTML = '';
     document.getElementById('seatPlanPrintArea').innerHTML = '';
     document.getElementById('tokenCardPrintArea').innerHTML = '';
-    document.getElementById('seatSummaryPrintArea').innerHTML = '';
     document.getElementById('invigilatorPrintArea').innerHTML = html;
 
     setTimeout(() => window.print(), 100);
@@ -3235,14 +2871,8 @@ async function openSeatTokenPrintWindow(mode) {
   try {
     const result = await apiCall('getSeatTokenData', { examId: currentExamId, requesterRole: session.role });
     if (!result.success) { alert(result.message || 'তথ্য পাওয়া যায়নি'); return; }
-    let halls = result.halls || [];
+    const halls = result.halls || [];
     if (halls.length === 0) { alert('এখনো সিট প্ল্যান তৈরি হয়নি'); return; }
-
-    const selectedHallId = document.getElementById('tokenHallFilter').value;
-    if (selectedHallId) {
-      halls = halls.filter(h => h.hallId === selectedHallId);
-      if (halls.length === 0) { alert('নির্বাচিত Hall-এ কোনো শিক্ষার্থী পাওয়া যায়নি'); return; }
-    }
 
     const CARDS_PER_PAGE = 12;
     let pagesHtml = '';
@@ -3259,14 +2889,13 @@ async function openSeatTokenPrintWindow(mode) {
             <div class="tok-class">${escapeHtml(st.className)}</div>
           </div>
         `).join('');
-        // ৯ ঘরের কম হলেও গ্রিড ভেঙে না যাওয়ার জন্য খালি ঘর পূরণ
+        // ১২ ঘরের কম হলেও গ্রিড ভেঙে না যাওয়ার জন্য খালি ঘর পূরণ
         const emptyCount = CARDS_PER_PAGE - pageStudents.length;
         const emptyHtml = Array(emptyCount).fill('<div></div>').join('');
 
         pagesHtml += `
           <div class="tok-hall-page">
-            <div class="tok-hall-title"></div>
-          
+            <div class="tok-hall-title">${escapeHtml(hall.hallName)}</div>
             <div class="tok-grid">${cardsHtml}${emptyHtml}</div>
           </div>
         `;
@@ -3276,77 +2905,7 @@ async function openSeatTokenPrintWindow(mode) {
     document.getElementById('admitCardPrintArea').innerHTML = '';
     document.getElementById('seatPlanPrintArea').innerHTML = '';
     document.getElementById('invigilatorPrintArea').innerHTML = '';
-    document.getElementById('seatSummaryPrintArea').innerHTML = '';
     document.getElementById('tokenCardPrintArea').innerHTML = pagesHtml;
-
-    setTimeout(() => window.print(), 100);
-  } catch (err) { alert('সার্ভারে সংযোগ করা যায়নি'); }
-}
-
-/* =========================================================
-   সিট সারাংশ Print/PDF — শুধু Super Admin
-   প্রতি A4 পেজে ১২টা কার্ড (৩x৪ গ্রিড), প্রতিটা Hall আলাদা পেজে,
-   প্রতিটা School এর জন্য আলাদা Box/Section (হেডার) সহ
-========================================================= */
-async function openSeatSummaryPrintWindow(mode) {
-  if (!currentExamId) { alert('আগে পরীক্ষা নির্বাচন করুন'); return; }
-  try {
-    const result = await apiCall('getSeatTokenData', { examId: currentExamId, requesterRole: session.role });
-    if (!result.success) { alert(result.message || 'তথ্য পাওয়া যায়নি'); return; }
-    const halls = result.halls || [];
-    if (halls.length === 0) { alert('এখনো সিট প্ল্যান তৈরি হয়নি'); return; }
-
-    const CELLS_PER_PAGE = 12;
-    let pagesHtml = '';
-
-    halls.forEach(hall => {
-      // স্কুল অনুযায়ী গ্রুপ করা (একই স্কুলের ছাত্র একসাথে থাকবে, Roll অনুযায়ী আগে থেকেই সাজানো আছে)
-      const bySchool = {};
-      const schoolOrder = [];
-      hall.students.forEach(st => {
-        if (!bySchool[st.schoolName]) { bySchool[st.schoolName] = []; schoolOrder.push(st.schoolName); }
-        bySchool[st.schoolName].push(st);
-      });
-
-      // প্রতিটা "সেল" — School header (পুরো রো জুড়ে) বা একটা student card
-      const cells = [];
-      schoolOrder.forEach(schoolName => {
-        cells.push({ type: 'header', schoolName, count: bySchool[schoolName].length });
-        bySchool[schoolName].forEach(st => cells.push({ type: 'card', student: st }));
-      });
-
-      // ১২ ঘর করে পেজ ভাগ করা (header নিজেও একটা ঘর হিসেবে ধরা হচ্ছে, পুরো রো জুড়ে দেখানোর জন্য grid-column:1/-1 ব্যবহার হচ্ছে)
-      for (let i = 0; i < cells.length; i += CELLS_PER_PAGE) {
-        const pageCells = cells.slice(i, i + CELLS_PER_PAGE);
-        const cellsHtml = pageCells.map(c => {
-          if (c.type === 'header') {
-            return `<div class="ss-school-header"><span>স্কুল: ${escapeHtml(c.schoolName)}</span><span>মোট ${c.count} জন</span></div>`;
-          }
-          const st = c.student;
-          return `
-            <div class="ss-card">
-              <div class="ss-roll-label">রোল</div>
-              <div class="ss-roll">${escapeHtml(String(st.rollNo))}</div>
-              <div class="ss-name">${escapeHtml(st.name)}</div>
-              <div class="ss-class">${escapeHtml(st.className)}</div>
-            </div>
-          `;
-        }).join('');
-
-        pagesHtml += `
-          <div class="ss-hall-page">
-            <div class="ss-hall-title">${escapeHtml(hall.hallName)} — সিট সারাংশ</div>
-            <div class="ss-grid">${cellsHtml}</div>
-          </div>
-        `;
-      }
-    });
-
-    document.getElementById('admitCardPrintArea').innerHTML = '';
-    document.getElementById('seatPlanPrintArea').innerHTML = '';
-    document.getElementById('invigilatorPrintArea').innerHTML = '';
-    document.getElementById('tokenCardPrintArea').innerHTML = '';
-    document.getElementById('seatSummaryPrintArea').innerHTML = pagesHtml;
 
     setTimeout(() => window.print(), 100);
   } catch (err) { alert('সার্ভারে সংযোগ করা যায়নি'); }
